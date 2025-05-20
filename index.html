@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canvas Login Interface</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f8f8f8;
+    }
+    canvas {
+      background-color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="loginCanvas" width="1000" height="563"></canvas>
+  <script>
+    const canvas = document.getElementById("loginCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Background image
+    const img = new Image();
+    img.src = "data:image/jpeg;base64,INSERT_IMAGE_BASE64_HERE"; // Replace with your image's base64 string
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      drawInterface();
+    };
+
+    // Input box properties
+    const emailBox = { x: 380, y: 190, width: 240, height: 30 };
+    const passwordBox = { x: 380, y: 240, width: 240, height: 30 };
+    const buttonBox = { x: 380, y: 300, width: 240, height: 40 };
+
+    let activeInput = null;
+    const inputValues = {
+      email: "",
+      password: "",
+    };
+
+    // Function to draw the interface
+    function drawInterface() {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      // Draw email input box
+      drawInputBox(emailBox, inputValues.email, activeInput === "email");
+
+      // Draw password input box
+      drawInputBox(passwordBox, inputValues.password, activeInput === "password");
+
+      // Draw login button
+      ctx.fillStyle = "#0070ba";
+      ctx.fillRect(buttonBox.x, buttonBox.y, buttonBox.width, buttonBox.height);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "16px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText("Log In", buttonBox.x + buttonBox.width / 2, buttonBox.y + 26);
+    }
+
+    // Function to draw an input box
+    function drawInputBox(box, text, isActive) {
+      ctx.strokeStyle = isActive ? "#0070ba" : "#cccccc";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(box.x, box.y, box.width, box.height);
+
+      ctx.font = "16px Arial";
+      ctx.fillStyle = "#000000";
+      ctx.textAlign = "left";
+      ctx.fillText(text, box.x + 5, box.y + 20);
+    }
+
+    // Handle mouse clicks
+    canvas.addEventListener("mousedown", (e) => {
+      const { left, top } = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - left;
+      const mouseY = e.clientY - top;
+
+      if (isInside(mouseX, mouseY, emailBox)) {
+        activeInput = "email";
+      } else if (isInside(mouseX, mouseY, passwordBox)) {
+        activeInput = "password";
+      } else if (isInside(mouseX, mouseY, buttonBox)) {
+        alert(`Email: ${inputValues.email}\nPassword: ${inputValues.password}`);
+      } else {
+        activeInput = null;
+      }
+      drawInterface();
+    });
+
+    // Handle keyboard input
+    document.addEventListener("keydown", (e) => {
+      if (!activeInput) return;
+
+      if (e.key === "Backspace") {
+        inputValues[activeInput] = inputValues[activeInput].slice(0, -1);
+      } else if (e.key.length === 1) {
+        inputValues[activeInput] += e.key;
+      }
+      drawInterface();
+    });
+
+    // Utility function to check if a point is inside a box
+    function isInside(x, y, box) {
+      return x > box.x && x < box.x + box.width && y > box.y && y < box.y + box.height;
+    }
+  </script>
+</body>
+</html>
